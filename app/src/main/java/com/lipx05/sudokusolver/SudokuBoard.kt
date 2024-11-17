@@ -122,7 +122,6 @@ class SudokuBoard(ctx: Context, attrs: AttributeSet? = null): View(ctx, attrs) {
     private fun drawNumbers(cv: Canvas) {
         letterColorPaint.textSize = cellSize.toFloat()
 
-
         for (r in 0..<9) {
             for (c in 0..<9) {
                 val board = solver.getBoard()
@@ -152,7 +151,12 @@ class SudokuBoard(ctx: Context, attrs: AttributeSet? = null): View(ctx, attrs) {
             if (solver.getBoard()[r][c] != 0) {
                 val txt = solver.getBoard()[r][c].toString()
 
-                letterColorPaint.getTextBounds(txt, 0, txt.length, letterColorPaintBounds)
+                letterColorPaint.getTextBounds(
+                    txt,
+                    0,
+                    txt.length,
+                    letterColorPaintBounds
+                )
                 val w = letterColorPaint.measureText(txt)
                 val h = letterColorPaintBounds.height().toFloat()
 
@@ -192,6 +196,18 @@ class SudokuBoard(ctx: Context, attrs: AttributeSet? = null): View(ctx, attrs) {
                 (r * cellSize).toFloat(),
                 cellFillColorPaint
             )
+
+            val boxSRow = (solver.getSelectedRow() / 3) * 3
+            val actualSRow = if (boxSRow % 3 == 0 && boxSRow > 0) boxSRow-3 else boxSRow
+            val boxSCol = (solver.getSelectedCol() / 3) * 3
+            val actualSCol = if (boxSCol % 3 == 0 && boxSCol > 0) boxSCol-3 else boxSCol
+
+            val left = actualSCol * cellSize.toFloat()
+            val top = actualSRow * cellSize.toFloat()
+            val right = left + (3 * cellSize.toFloat())
+            val bottom = top + (3 * cellSize.toFloat())
+
+            cv.drawRect(left, top, right, bottom, cellFillColorPaint)
         }
 
         invalidate()

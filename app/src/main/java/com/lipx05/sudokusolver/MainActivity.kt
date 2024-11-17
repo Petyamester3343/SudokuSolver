@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var captureBtn: Button
     private lateinit var camExecutor: ExecutorService
     private lateinit var imgCapture: ImageCapture
+
     private var isCamActive = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +61,11 @@ class MainActivity : AppCompatActivity() {
 
         captureBtn.setOnClickListener {
             captureImg()
-            Toast.makeText(this, "Photo taken", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this,
+                resources.getString(R.string.photo_taken_str),
+                Toast.LENGTH_SHORT
+            ).show()
         }
 
         startCam()
@@ -68,14 +73,30 @@ class MainActivity : AppCompatActivity() {
 
     private fun toggleCam() {
         isCamActive = !isCamActive
+
         findViewById<PreviewView>(R.id.camPreview).visibility =
-            if (isCamActive) View.VISIBLE else View.GONE
+            if (isCamActive)
+                View.VISIBLE
+            else
+                View.GONE
 
-        solveBtn.visibility = if (isCamActive) View.GONE else View.VISIBLE
+        solveBtn.visibility =
+            if (isCamActive)
+                View.GONE
+            else
+                View.VISIBLE
 
-        captureBtn.visibility = if(isCamActive) View.VISIBLE else View.GONE
+        captureBtn.visibility =
+            if(isCamActive)
+                View.VISIBLE
+            else
+                View.GONE
 
-        toggleCamBtn.text = if (isCamActive) "Close Camera" else "Open Camera"
+        toggleCamBtn.text =
+            if (!isCamActive)
+                resources.getString(R.string.open_cam_str)
+            else
+                resources.getString(R.string.close_cam_str)
     }
 
     private fun startCam() {

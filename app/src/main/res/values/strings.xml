@@ -15,5 +15,8 @@
     <string name="solve_clear_str">Clear</string>
     <string name="camera">Camera</string>
     <string name="capture">Capture</string>
+    <string name="photo_taken_str">Photo Taken</string>
+    <string name="open_cam_str">Open Camera</string>
+    <string name="close_cam_str">Close Camera</string>
 
 </resources>

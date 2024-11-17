@@ -4,4 +4,7 @@
     <string name="solve_clear_str">Töröl</string>
     <string name="camera">Kamera</string>
     <string name="capture">Fotózz!</string>
+    <string name="photo_taken_str">Lefotózva!</string>
+    <string name="open_cam_str">Kamera megnyit</string>
+    <string name="close_cam_str">Kamera bezár</string>
 </resources>

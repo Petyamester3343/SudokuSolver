@@ -1,17 +1,7 @@
 package com.lipx05.sudokusolver
 
 class Solver {
-    private var board = arrayOf(
-        arrayOf(0,0,0,0,0,0,0,0,0),
-        arrayOf(0,0,0,0,0,0,0,0,0),
-        arrayOf(0,0,0,0,0,0,0,0,0),
-        arrayOf(0,0,0,0,0,0,0,0,0),
-        arrayOf(0,0,0,0,0,0,0,0,0),
-        arrayOf(0,0,0,0,0,0,0,0,0),
-        arrayOf(0,0,0,0,0,0,0,0,0),
-        arrayOf(0,0,0,0,0,0,0,0,0),
-        arrayOf(0,0,0,0,0,0,0,0,0)
-    )
+    private var board = Array(9) { _ -> Array(9) { _ -> 0 } }
     private var emptyBoxIndex: ArrayList<ArrayList<Any>> = ArrayList()
 
     private var selectedRow = -1
