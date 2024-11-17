@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="solve_str">Megold</string>
+    <string name="solve_clear_str">Töröl</string>
+    <string name="camera">Kamera</string>
+    <string name="capture">Fotózz!</string>
+</resources>
