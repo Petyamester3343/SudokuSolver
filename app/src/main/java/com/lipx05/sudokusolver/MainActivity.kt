@@ -1,5 +1,6 @@
 package com.lipx05.sudokusolver
 
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -16,6 +17,7 @@ import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -68,6 +70,7 @@ class MainActivity : AppCompatActivity() {
             ).show()
         }
 
+        requestCamPerm()
         startCam()
     }
 
@@ -109,7 +112,13 @@ class MainActivity : AppCompatActivity() {
             }
             imgCapture = ImageCapture.Builder().build()
             val camSelector = CameraSelector.DEFAULT_BACK_CAMERA
-            camProv.bindToLifecycle(this, camSelector, preview, imgCapture)
+
+            try {
+                camProv.unbindAll()
+                camProv.bindToLifecycle(this, camSelector, preview, imgCapture)
+            } catch (e: Exception) {
+                Log.e("CameraX", "Use case binding failed", e)
+            }
         }, ContextCompat.getMainExecutor(this))
     }
 
@@ -119,6 +128,7 @@ class MainActivity : AppCompatActivity() {
             ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageCapturedCallback() {
                 override fun onCaptureSuccess(image: ImageProxy) {
+                    Log.d("CameraX", "Image captured successfully")
                     processImgForOCR(image)
                     image.close()
                 }
@@ -238,9 +248,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun requestCamPerm() {
+        if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.CAMERA),
+                REQUEST_CAM_PERM
+            )
+        }
+    }
+
     inner class SolveBoardThread: Runnable {
         override fun run() {
             gameBoardSolver.solve(gameBoard)
         }
+    }
+
+    companion object {
+        private const val REQUEST_CAM_PERM = 1001
     }
 }

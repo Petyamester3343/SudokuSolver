@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import kotlin.math.ceil
@@ -34,7 +36,8 @@ class SudokuBoard(ctx: Context, attrs: AttributeSet? = null): View(ctx, attrs) {
         val a: TypedArray = ctx.theme.obtainStyledAttributes(
             attrs,
             R.styleable.SudokuBoard,
-            0, 0
+            0,
+            0
         )
 
         try {
@@ -94,7 +97,7 @@ class SudokuBoard(ctx: Context, attrs: AttributeSet? = null): View(ctx, attrs) {
         letterSolveColorPaint.isAntiAlias = true
         letterSolveColorPaint.color = letterSolveColor
 
-        colorCell(cv, solver.getSelectedRow(), solver.getSelectedCol())
+        colorCell(cv, solver.getSelectedRow() - 1, solver.getSelectedCol() - 1)
         cv.drawRect(0f, 0f, width.toFloat(), height.toFloat(), boardColorPaint)
         drawBoard(cv)
         drawNumbers(cv)
@@ -109,8 +112,8 @@ class SudokuBoard(ctx: Context, attrs: AttributeSet? = null): View(ctx, attrs) {
         val action = event.action
 
         if (action == MotionEvent.ACTION_DOWN) {
-            solver.setSelectedRow(ceil(y/cellSize).toInt())
-            solver.setSelectedCol(ceil(x/cellSize).toInt())
+            solver.setSelectedRow(ceil((y+1)/cellSize).toInt())
+            solver.setSelectedCol(ceil((x+1)/cellSize).toInt())
             isValid = true
         } else {
             isValid = false
@@ -174,41 +177,50 @@ class SudokuBoard(ctx: Context, attrs: AttributeSet? = null): View(ctx, attrs) {
         if (solver.getSelectedCol() != -1 && solver.getSelectedRow() != -1) {
             // paint the row and column
             cv.drawRect(
-                (c - 1f) * cellSize,
-                0f,
                 (c * cellSize).toFloat(),
+                0f,
+                ((c + 1) * cellSize).toFloat(),
                 cellSize * 9f,
                 cellsHighlightColorPaint
             )
             cv.drawRect(
                 0f,
-                (r - 1f) * cellSize,
-                cellSize * 9f,
                 (r * cellSize).toFloat(),
+                cellSize * 9f,
+                ((r + 1) * cellSize).toFloat(),
                 cellsHighlightColorPaint
             )
 
-            // paint the cell itself
-            cv.drawRect(
-                (c - 1f) * cellSize,
-                (r - 1f) * cellSize,
-                (c * cellSize).toFloat(),
-                (r * cellSize).toFloat(),
-                cellFillColorPaint
-            )
+            if (r in 0..8 && c in 0..8) { // Validate the cell indices
+                // Calculate the starting row and column of the 3x3 box
+                val bSRow = (r / 3) * 3
+                val bSCol = (c / 3) * 3
 
-            val boxSRow = (solver.getSelectedRow() / 3) * 3
-            val actualSRow = if (boxSRow % 3 == 0 && boxSRow > 0) boxSRow-3 else boxSRow
-            val boxSCol = (solver.getSelectedCol() / 3) * 3
-            val actualSCol = if (boxSCol % 3 == 0 && boxSCol > 0) boxSCol-3 else boxSCol
+                // DEBUG: Log selected cell and box start for verification
+                Log.d("Sudoku", "Selected Cell: ($r, $c)")
+                Log.d("Sudoku", "Calculated Box Start: ($bSRow, $bSCol)")
 
-            val left = actualSCol * cellSize.toFloat()
-            val top = actualSRow * cellSize.toFloat()
-            val right = left + (3 * cellSize.toFloat())
-            val bottom = top + (3 * cellSize.toFloat())
+                // Draw the 3x3 box
+                val left = bSCol * cellSize.toFloat() - 1
+                val top = bSRow * cellSize.toFloat() - 1
+                val right = left + (3 * cellSize.toFloat()) - 1
+                val bottom = top + (3 * cellSize.toFloat()) - 1
 
-            cv.drawRect(left, top, right, bottom, cellFillColorPaint)
+                cv.drawRect(left, top, right, bottom, cellFillColorPaint)
+
+                // Highlight the selected cell
+                val cellLeft = c * cellSize.toFloat()
+                val cellTop = r * cellSize.toFloat()
+                val cellRight = cellLeft + cellSize.toFloat()
+                val cellBottom = cellTop + cellSize.toFloat()
+
+                cv.drawRect(cellLeft, cellTop, cellRight, cellBottom, cellsHighlightColorPaint)
+            } else {
+                Log.w("Sudoku", "Invalid cell selection: ($r, $c)")
+            }
         }
+
+        //drawDebugGrid(cv)
 
         invalidate()
     }
@@ -260,4 +272,19 @@ class SudokuBoard(ctx: Context, attrs: AttributeSet? = null): View(ctx, attrs) {
     fun getSolver(): Solver {
         return solver
     }
+
+    /*private fun drawDebugGrid(cv: Canvas) {
+        val debugPaint = Paint().apply {
+            color = Color.RED
+            textSize = 36f
+            isAntiAlias = true
+        }
+        for(r in 0..8) {
+            for (c in 0..8) {
+                val x = c * cellSize.toFloat()
+                val y = r * cellSize.toFloat()
+                cv.drawText("($r, $c)", x+20, y+65, debugPaint)
+            }
+        }
+    }*/
 }
