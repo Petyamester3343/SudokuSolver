@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.idea.tcs.extras.isIdeaProjectLevelKey
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -12,6 +10,7 @@ android {
     defaultConfig {
         applicationId = "com.lipx05.sudokusolver"
         minSdk = 24
+        //noinspection OldTargetApi
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"

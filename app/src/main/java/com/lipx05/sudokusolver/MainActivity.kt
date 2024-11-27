@@ -2,30 +2,16 @@ package com.lipx05.sudokusolver
 
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ExperimentalGetImage
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.ImageProxy
-import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,10 +20,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var solveBtn: Button
     private lateinit var toggleCamBtn: Button
     private lateinit var captureBtn: Button
-    private lateinit var camExecutor: ExecutorService
-    private lateinit var imgCapture: ImageCapture
-
-    private var isCamActive = false
+    private lateinit var camManager: CamManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,107 +38,51 @@ class MainActivity : AppCompatActivity() {
         toggleCamBtn = findViewById(R.id.toggle_cam)
         captureBtn = findViewById(R.id.captureBtn)
 
-        camExecutor = Executors.newSingleThreadExecutor()
+        val previewView = findViewById<PreviewView>(R.id.camPreview)
+
+        val ocrProcessor = OCRProcessor(
+            onSuccess = { recognizedText ->
+                val parsedGrid = parseSudokuGrid(recognizedText)
+                updateSolverGrid(parsedGrid)
+                gameBoard.invalidate()
+                camManager.toggleCam(solveBtn, captureBtn, toggleCamBtn, this)
+            },
+            onFailure = { err ->
+                Toast.makeText(this, err, Toast.LENGTH_SHORT).show()
+            }
+        )
+
+        camManager = CamManager(
+            ctx = this,
+            previewView = previewView,
+            ocrProcessor = ocrProcessor
+        )
 
         toggleCamBtn.setOnClickListener {
-            toggleCam()
+            camManager.toggleCam(solveBtn, captureBtn, toggleCamBtn, this)
         }
 
         captureBtn.setOnClickListener {
-            captureImg()
-            Toast.makeText(
-                this,
-                resources.getString(R.string.photo_taken_str),
-                Toast.LENGTH_SHORT
-            ).show()
+            camManager.captureImg(
+                onSuccess = {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.photo_taken_str),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                },
+                onFailure = { err ->
+                    Toast.makeText(
+                        this,
+                        err,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            )
         }
 
         requestCamPerm()
-        startCam()
-    }
-
-    private fun toggleCam() {
-        isCamActive = !isCamActive
-
-        findViewById<PreviewView>(R.id.camPreview).visibility =
-            if (isCamActive)
-                View.VISIBLE
-            else
-                View.GONE
-
-        solveBtn.visibility =
-            if (isCamActive)
-                View.GONE
-            else
-                View.VISIBLE
-
-        captureBtn.visibility =
-            if(isCamActive)
-                View.VISIBLE
-            else
-                View.GONE
-
-        toggleCamBtn.text =
-            if (!isCamActive)
-                resources.getString(R.string.open_cam_str)
-            else
-                resources.getString(R.string.close_cam_str)
-    }
-
-    private fun startCam() {
-        val camProvFut = ProcessCameraProvider.getInstance(this)
-        camProvFut.addListener({
-            val camProv = camProvFut.get()
-            val preview = Preview.Builder().build().also {
-                it.surfaceProvider = findViewById<PreviewView>(R.id.camPreview)
-                    .surfaceProvider
-            }
-            imgCapture = ImageCapture.Builder().build()
-            val camSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
-            try {
-                camProv.unbindAll()
-                camProv.bindToLifecycle(this, camSelector, preview, imgCapture)
-            } catch (e: Exception) {
-                Log.e("CameraX", "Use case binding failed", e)
-            }
-        }, ContextCompat.getMainExecutor(this))
-    }
-
-    private fun captureImg() {
-        val imageCapture = imgCapture
-        imageCapture.takePicture(
-            ContextCompat.getMainExecutor(this),
-            object : ImageCapture.OnImageCapturedCallback() {
-                override fun onCaptureSuccess(image: ImageProxy) {
-                    Log.d("CameraX", "Image captured successfully")
-                    processImgForOCR(image)
-                    image.close()
-                }
-
-                override fun onError(e: ImageCaptureException) {
-                    Log.e("CameraX", "Image capture failed: ${e.message}", e)
-                }
-            }
-        )
-    }
-
-    @OptIn(ExperimentalGetImage::class)
-    private fun processImgForOCR(img: ImageProxy) {
-        val mediaImg = img.image ?: return
-        val inImg = InputImage.fromMediaImage(mediaImg, img.imageInfo.rotationDegrees)
-        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-
-        recognizer.process(inImg)
-            .addOnSuccessListener { visionText ->
-                val parseGrid = parseSudokuGrid(visionText.text)
-                updateSolverGrid(parseGrid)
-                gameBoard.invalidate()
-                toggleCam()
-            }
-            .addOnFailureListener { e ->
-                Log.e("OCR", "Text recognition failed: ${e.message}", e)
-            }
+        camManager.startCam()
     }
 
     private fun parseSudokuGrid(recognizedTxt: String): Array<IntArray> {
@@ -185,7 +112,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        camExecutor.shutdown()
+        camManager.shutdown()
     }
 
     fun btn1Press(v: View) {
