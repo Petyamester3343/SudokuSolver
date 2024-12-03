@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.util.AttributeSet
@@ -131,7 +130,9 @@ class SudokuBoard(ctx: Context, attrs: AttributeSet? = null): View(ctx, attrs) {
                 if (board[r][c] != 0) {
                     val txt = solver.getBoard()[r][c].toString()
 
-                    letterColorPaint.getTextBounds(txt, 0, txt.length, letterColorPaintBounds)
+                    letterColorPaint.getTextBounds(
+                        txt, 0, txt.length, letterColorPaintBounds
+                    )
                     val w = letterColorPaint.measureText(txt)
                     val h = letterColorPaintBounds.height().toFloat()
 

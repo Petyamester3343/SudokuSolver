@@ -28,12 +28,12 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
+
+    ndkVersion = "27.0.12077973"
+    buildToolsVersion = "35.0.0"
 }
 
 dependencies {
@@ -43,6 +43,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation("org.tensorflow:tensorflow-lite:2.13.0")
+    implementation("org.tensorflow:tensorflow-lite-gpu:2.13.0")
 
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)

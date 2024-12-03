@@ -2,6 +2,7 @@ package com.lipx05.sudokusolver
 
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
@@ -42,7 +43,16 @@ class MainActivity : AppCompatActivity() {
 
         val ocrProcessor = OCRProcessor(
             onSuccess = { recognizedText ->
+                Toast.makeText(this, recognizedText, Toast.LENGTH_SHORT).show()
                 val parsedGrid = parseSudokuGrid(recognizedText)
+                if(parsedGrid.isEmpty()) {
+                    Log.e("OCR", "Parsed grid is empty or not valid!");
+                } else {
+                    Toast.makeText(
+                        this, parsedGrid.joinToString(","), Toast.LENGTH_SHORT
+                    ).show()
+                    Log.d("OCR", "Parsed grid valid ($parsedGrid)")
+                }
                 updateSolverGrid(parsedGrid)
                 gameBoard.invalidate()
                 camManager.toggleCam(solveBtn, captureBtn, toggleCamBtn, this)
@@ -103,6 +113,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateSolverGrid(grid: Array<IntArray>) {
+        for (row in grid) {
+            Log.d("Grid", row.joinToString(", "))
+        }
+
         for(r in 0..8) {
             for (c in 0..8) {
                 gameBoardSolver.getBoard()[r][c] = grid[r][c]

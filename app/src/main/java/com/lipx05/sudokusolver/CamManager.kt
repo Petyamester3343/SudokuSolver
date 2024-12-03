@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
@@ -15,14 +16,13 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
-import com.google.mlkit.vision.common.InputImage
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class CamManager(
     private val ctx: Context,
     private val previewView: PreviewView,
-    private val ocrProcessor: OCRProcessor
+    private var ocrProcessor: OCRProcessor
 ) {
     private var imgCapture: ImageCapture? = null
     private val camExec: ExecutorService = Executors.newSingleThreadExecutor()
@@ -84,30 +84,26 @@ class CamManager(
         )
     }
 
-    /*private fun preprocessImg(bitmap: Bitmap): Bitmap {
-        val mat = Mat()
-        Utils.bitmapToMat(bitmap, mat)
-
-        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGR2GRAY)
-
-        Imgproc.GaussianBlur(mat, mat, Size(5.0, 5.0), 0.0)
-
-        Imgproc.adaptiveThreshold(
-            mat, mat, 255.0, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,
-            Imgproc.THRESH_BINARY, 11, 2.0
-        )
-
-        val processedBitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888)
-        Utils.matToBitmap(mat, processedBitmap)
-
-        return processedBitmap
-    }*/
-
     @OptIn(ExperimentalGetImage::class)
     private fun processImg4OCR(img: ImageProxy) {
         val mediaImg = img.image ?: return
-        val inImg = InputImage.fromMediaImage(mediaImg, img.imageInfo.rotationDegrees)
-        ocrProcessor.processImg(inImg)
+        if(mediaImg.format == 0x100) {
+            Toast.makeText(this.ctx, "JPEG", Toast.LENGTH_SHORT).show()
+        }
+        val conv = YuvToRgbConverter()
+        val bitmap = conv.toBitmap(mediaImg)
+
+        ocrProcessor = OCRProcessor(
+            onSuccess = { recognizedText ->
+                Log.d("OCR", "Recognized text: $recognizedText")
+                Toast.makeText(this.ctx, recognizedText, Toast.LENGTH_SHORT).show()
+            },
+            onFailure = { error ->
+                Log.e("OCR", error)
+            }
+        )
+        ocrProcessor.extractCells(bitmap)
+        img.close()
     }
 
     fun shutdown() {
