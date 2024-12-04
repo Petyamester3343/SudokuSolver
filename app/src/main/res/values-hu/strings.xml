@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="solve_str">Megold</string>
-    <string name="solve_clear_str">Töröl</string>
+    <string name="solve_str">MEGOLD</string>
+    <string name="solve_clear_str">TÖRÖL</string>
     <string name="camera">Kamera</string>
     <string name="capture">Fotózz!</string>
     <string name="photo_taken_str">Lefotózva!</string>
     <string name="open_cam_str">Kamera megnyit</string>
     <string name="close_cam_str">Kamera bezár</string>
+    <string name="generate">GENERÁL</string>
+    <string name="diff_easy">Könnyű</string>
+    <string name="diff_med">Közepes</string>
+    <string name="diff_hard">Nehéz</string>
+    <string name="diff_xpert">Profi</string>
+    <string name="announce1_str">Válasszon nehézséget!</string>
+    <string name="cancel">Mégsem</string>
 </resources>

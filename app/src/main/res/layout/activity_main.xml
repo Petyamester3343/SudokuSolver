@@ -146,31 +146,46 @@
 
     </GridLayout>
 
-    <Button
-        android:id="@+id/solve_btn"
-        android:layout_width="125dp"
+    <GridLayout
+        android:id="@+id/sudokuBtnGrid"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/solve_btn"
-        android:onClick="solve"
-        android:text="@string/solve_str"
-        android:textSize="18sp"
-        custom:layout_constraintBottom_toBottomOf="parent"
-        custom:layout_constraintEnd_toEndOf="parent"
+        android:columnCount="2"
         custom:layout_constraintStart_toStartOf="parent"
-        custom:layout_constraintTop_toBottomOf="@+id/numGrid"
-        custom:layout_constraintVertical_bias="0.123" />
+        custom:layout_constraintEnd_toEndOf="parent"
+        custom:layout_constraintTop_toBottomOf="@id/numGrid"
+        custom:layout_constraintBottom_toTopOf="@id/toggle_cam">
+
+        <Button
+            android:id="@+id/solve_btn"
+            android:layout_width="125dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/solve_btn"
+            android:onClick="solve"
+            android:text="@string/solve_str"
+            android:textSize="18sp"/>
+
+        <Button
+            android:id="@+id/randomPuzzleBtn"
+            android:layout_width="125dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/solve_btn"
+            android:text="@string/generate"
+            android:textSize="18sp" />
+
+    </GridLayout>
 
     <Button
         android:id="@+id/toggle_cam"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/open_cam_str"
+        android:layout_marginBottom="30dp"
         custom:layout_constraintBottom_toBottomOf="parent"
         custom:layout_constraintEnd_toEndOf="parent"
         custom:layout_constraintHorizontal_bias="0.498"
         custom:layout_constraintStart_toStartOf="parent"
-        custom:layout_constraintTop_toBottomOf="@+id/solve_btn"
-        custom:layout_constraintVertical_bias="0.361" />
+        custom:layout_constraintTop_toBottomOf="@+id/sudokuBtnGrid" />
 
 
     <androidx.camera.view.PreviewView

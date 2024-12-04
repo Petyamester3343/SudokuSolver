@@ -18,5 +18,12 @@
     <string name="photo_taken_str">Photo Taken</string>
     <string name="open_cam_str">Open Camera</string>
     <string name="close_cam_str">Close Camera</string>
+    <string name="generate">GENERATE</string>
+    <string name="diff_easy">Easy</string>
+    <string name="diff_med">Medium</string>
+    <string name="diff_hard">Hard</string>
+    <string name="diff_xpert">Expert</string>
+    <string name="announce1_str">Select difficulty!</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

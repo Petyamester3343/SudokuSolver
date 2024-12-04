@@ -1,7 +1,7 @@
 package com.lipx05.sudokusolver
 
 class Solver {
-    private var board = Array(9) { _ -> Array(9) { _ -> 0 } }
+    private var board = Array(9) { _ -> IntArray(9) { _ -> 0 } }
     private var emptyBoxIndex: ArrayList<ArrayList<Any>> = ArrayList()
 
     private var selectedRow = -1
@@ -26,23 +26,17 @@ class Solver {
     private fun check(r: Int, c: Int): Boolean {
         if (this.board[r][c] > 0) {
             for (i in 0..8) {
-                if (this.board[i][c] == this.board[r][c] && r != i) {
-                    return false
-                }
-
-                if (this.board[r][i] == this.board[r][c] && c != i) {
-                    return false
-                }
+                if (this.board[i][c] == this.board[r][c] && r != i) return false
+                if (this.board[r][i] == this.board[r][c] && c != i) return false
             }
 
             val boxRow: Int = r / 3
             val boxCol: Int = c / 3
 
-            for (row in boxRow*3..<boxRow * 3 + 3) {
+            for (row in boxRow * 3..<boxRow * 3 + 3) {
                 for (col in boxCol * 3..<boxCol * 3 + 3) {
-                    if (this.board[r][c] == this.board[row][col] && row != r && col != c) {
+                    if (this.board[r][c] == this.board[row][col] && row != r && col != c)
                         return false
-                    }
                 }
             }
         }
@@ -104,7 +98,7 @@ class Solver {
         }
     }
 
-    fun getBoard(): Array<Array<Int>> {
+    fun getBoard(): Array<IntArray> {
         return this.board
     }
 
