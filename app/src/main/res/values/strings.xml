@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Sudoku Solver</string>
+    <string name="app_name" translatable="false">SudokuSolver</string>
 
     <string name="btn1" translatable="false">1</string>
     <string name="btn2" translatable="false">2</string>
@@ -12,7 +12,7 @@
     <string name="btn9" translatable="false">9</string>
 
     <string name="solve_str">Solve</string>
-    <string name="solve_clear_str">Clear</string>
+    <string name="clear_str">Clear</string>
     <string name="camera">Camera</string>
     <string name="capture">Capture</string>
     <string name="photo_taken_str">Photo Taken</string>

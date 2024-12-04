@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="solve_str">MEGOLD</string>
-    <string name="solve_clear_str">TÖRÖL</string>
+    <string name="clear_str">TÖRÖL</string>
     <string name="camera">Kamera</string>
     <string name="capture">Fotózz!</string>
     <string name="photo_taken_str">Lefotózva!</string>

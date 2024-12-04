@@ -1,22 +1,17 @@
 package com.lipx05.sudokusolver
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.graphics.Rect
-import android.os.Environment
 import android.util.Log
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
-import java.io.File
-import java.io.FileOutputStream
 
 class OCRProcessor(
-    private val ctx: Context,
     private val onSuccess: (String) -> Unit,
     private val onFailure: (String) -> Unit
 ) {
@@ -94,6 +89,8 @@ class OCRProcessor(
                     val y = i * cellSize + padding
                     val size = cellSize - (2 * padding)
 
+                    Log.d("OCR", "Processing cell ($i, $j) - x=$x, y=$y, size=$size")
+
                     if(x + size <= croppedGrid.width
                         && y + size <= croppedGrid.height
                         && x >= 0 && y >= 0 && size > 0) {
@@ -108,10 +105,12 @@ class OCRProcessor(
                             "OCR",
                             "Invalid cell dimensions at ($i, $j): x=$x, y=$y, size=$size"
                         )
+                        onFailure("Invalid cell dimensions at ($i, $j): x=$x, y=$y, size=$size")
                         processedCells++
                     }
                 } catch(e: Exception) {
                     Log.e("OCR", "Error extracting cell at ($i, $j): ${e.message}")
+                    onFailure("Error extracting cell at ($i, $j): ${e.message}")
                     processedCells++
                 }
             }
@@ -183,7 +182,7 @@ class OCRProcessor(
         val w = right - left
         val h = bottom - top
 
-        val size = minOf(right - left, bottom - top, bitmap.width - left, bitmap.height - top)
+        val size = minOf(w, h, bitmap.width - left, bitmap.height - top)
         right = left + size
         bottom = top + size
 
@@ -244,7 +243,7 @@ class OCRProcessor(
         }
     }
 
-    private fun saveBitmapForDebug(bitmap: Bitmap, name: String) {
+    /*private fun saveBitmapForDebug(bitmap: Bitmap, name: String) {
         try {
             val file = File(
                 ctx.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
@@ -261,5 +260,5 @@ class OCRProcessor(
         } catch(e: Exception) {
             Log.e("OCR", "Failed to save debug image: ${e.message}")
         }
-    }
+    }*/
 }

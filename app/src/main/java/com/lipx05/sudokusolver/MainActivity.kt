@@ -44,11 +44,11 @@ class MainActivity : AppCompatActivity() {
         generateBtn = findViewById(R.id.randomPuzzleBtn)
         toggleCamBtn = findViewById(R.id.toggle_cam)
         captureBtn = findViewById(R.id.captureBtn)
+        puzzleGenerator = Generator()
 
         val previewView = findViewById<PreviewView>(R.id.camPreview)
 
         val ocrProcessor = OCRProcessor(
-            ctx = this,
             onSuccess = { recognizedText ->
                 Toast.makeText(this, recognizedText, Toast.LENGTH_SHORT).show()
                 val parsedGrid = parseSudokuGrid(recognizedText)
@@ -69,8 +69,6 @@ class MainActivity : AppCompatActivity() {
             }
         )
 
-        puzzleGenerator = Generator()
-
         camManager = CamManager(
             ctx = this,
             previewView = previewView,
@@ -78,6 +76,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         toggleCamBtn.setOnClickListener {
+            camManager.startCam()
             camManager.toggleCam(solveBtn, generateBtn, captureBtn, toggleCamBtn, this)
         }
 
@@ -121,7 +120,8 @@ class MainActivity : AppCompatActivity() {
                 "Camera initialization failed. Retrying...",
                 Toast.LENGTH_SHORT
             ).show()
-            // Újrapróbálkozás késleltetéssel
+
+            // Try again with latency
             Handler(Looper.getMainLooper()).postDelayed({
                 initCam()
             }, 1000)
@@ -234,19 +234,17 @@ class MainActivity : AppCompatActivity() {
         gameBoard.invalidate()
     }
 
-    fun solve(v: View) {
-        if (solveBtn.text.toString() == getString(R.string.solve_str)) {
-            solveBtn.text = getString(R.string.solve_clear_str)
-            gameBoardSolver.getEmptyBoxIndexes()
-            val gameBoardThread = SolveBoardThread()
-            Thread(gameBoardThread).start()
-            gameBoard.invalidate()
-        }
-        else {
-            solveBtn.text = getString(R.string.solve_str)
-            gameBoardSolver.resetBoard()
-            gameBoard.invalidate()
-        }
+    fun solve(v: View) = if (solveBtn.text.toString() == getString(R.string.solve_str)) {
+        solveBtn.text = getString(R.string.clear_str)
+        gameBoardSolver.getEmptyBoxIndexes()
+        val gameBoardThread = SolveBoardThread()
+        Thread(gameBoardThread).start()
+        gameBoard.invalidate()
+    }
+    else {
+        solveBtn.text = getString(R.string.solve_str)
+        gameBoardSolver.resetBoard()
+        gameBoard.invalidate()
     }
 
     private fun generate() {

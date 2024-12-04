@@ -10,9 +10,7 @@ class Generator {
         clearBoard()
         fillBoard(0,0)
         removeCells(diff.emptyCells)
-        return board.map {
-            it.clone()
-        }.toTypedArray()
+        return board.map { it.clone() }.toTypedArray()
     }
 
     private fun clearBoard() {
@@ -25,7 +23,7 @@ class Generator {
 
     private fun fillBoard(row: Int, col: Int): Boolean {
         if (col == size) {
-            return fillBoard(row+1, 0)
+            return fillBoard(row + 1, 0)
         }
 
         if (row == size) {
@@ -33,7 +31,7 @@ class Generator {
         }
 
         if(board[row][col] != 0) {
-            return fillBoard(row, col+1)
+            return fillBoard(row, col + 1)
         }
 
         val numbers = (1..9).shuffled()

@@ -8,8 +8,6 @@ enum class Difficulty(val emptyCells: Int) {
 
     companion object {
         fun fromInt(value: Int) = entries.toTypedArray()
-            .firstOrNull {
-                it.emptyCells == value
-            } ?: MEDIUM
+            .firstOrNull { it.emptyCells == value } ?: MEDIUM
     }
 }
